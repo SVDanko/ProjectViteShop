@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { formatPrice } from '../../utils/formatPrice';
 
 /**
@@ -12,38 +12,33 @@ import { formatPrice } from '../../utils/formatPrice';
  * - Предоставляет навигацию к детальной странице товара
  */
 const Products = () => {
-  // Состояние для хранения списка товаров
-  const [products, setProducts] = useState([]);
-  // Состояние для отслеживания процесса загрузки
-  const [loading, setLoading] = useState(true);
-  // Состояние для хранения ошибок
-  const [error, setError] = useState(null);
+  const [products, setProducts] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
 
-  // Загрузка данных при монтировании компонента
-  useEffect(() => {
-    fetch('https://fakestoreapi.com/products')
-      .then(response => {
+  React.useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('https://fakestoreapi.com/products');
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('Failed to fetch products');
         }
-        return response.json();
-      })
-      .then(data => {
+        const data = await response.json();
         setProducts(data);
         setLoading(false);
-      })
-      .catch(error => {
-        setError(error.message);
+      } catch (err) {
+        setError(err.message);
         setLoading(false);
-      });
+      }
+    };
+
+    fetchProducts();
   }, []);
 
-  // Отображение состояния загрузки
   if (loading) {
     return <div className="products__loading">Loading...</div>;
   }
 
-  // Отображение ошибки, если она есть
   if (error) {
     return <div className="products__error">Error: {error}</div>;
   }
@@ -52,7 +47,7 @@ const Products = () => {
     <div className="products">
       <h1>Our Products</h1>
       <div className="products__grid">
-        {products.map((product) => (
+        {products.map(product => (
           <div key={product.id} className="products__item">
             <img src={product.image} alt={product.title} className="products__item-image" />
             <h3>{product.title}</h3>

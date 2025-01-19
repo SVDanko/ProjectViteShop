@@ -1,31 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router';
+import React from 'react';
+import { useParams } from 'react-router-dom';
 import { formatPrice } from '../../utils/formatPrice';
 
 /**
  * Компонент Product - отображает детальную информацию о конкретном товаре
  * 
- * @param {Object} props - пропсы компонента
- * @param {Function} props.addToCart - функция для добавления товара в корзину
- * 
  * Функциональность:
  * - Получает данные о товаре по ID из URL
  * - Отображает детальную информацию о товаре
- * - Позволяет добавить товар в корзину
  * - Обрабатывает состояния загрузки и ошибок
  */
-const Product = ({ addToCart }) => {
-  // Получение ID товара из URL
+const Product = () => {
   const { id } = useParams();
-  
-  // Состояние для хранения данных о товаре
-  const [product, setProduct] = useState(null);
-  // Состояние для отслеживания загрузки
-  const [loading, setLoading] = useState(true);
-  // Состояние для хранения ошибок
-  const [error, setError] = useState(null);
+  const [product, setProduct] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
@@ -51,7 +42,7 @@ const Product = ({ addToCart }) => {
   }
 
   if (error) {
-    return <div className="product__error">Error: {error}</div>;
+    return <div className="product__error">{error}</div>;
   }
 
   if (!product) {
@@ -60,18 +51,11 @@ const Product = ({ addToCart }) => {
 
   return (
     <div className="product">
-      <img src={product.image} alt={product.title} className="product__image" />
-      <div className="product__info">
-        <h1 className="product__title">{product.title}</h1>
-        <p className="product__description">{product.description}</p>
-        <p className="product__price">${formatPrice(product.price)}</p>
-        <button 
-          onClick={() => addToCart(product)} 
-          className="product__add-to-cart"
-        >
-          Add to Cart
-        </button>
-      </div>
+      <h2 className="product__title">{product.title}</h2>
+      <img className="product__image" src={product.image} alt={product.title} />
+      <p className="product__description">{product.description}</p>
+      <p className="product__price">{formatPrice(product.price)}</p>
+      <p className="product__category">Category: {product.category}</p>
     </div>
   );
 };

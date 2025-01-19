@@ -1,11 +1,14 @@
 import React from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
   return (
     <div className="home">
       <h1>Welcome to Our Store</h1>
-      <Link to="/products" className="home__link">View Products</Link>
+      <p>Find the best products at the best prices</p>
+      <Link to="/products" className="home__cta-button">
+        View Our Products
+      </Link>
     </div>
   );
 };
