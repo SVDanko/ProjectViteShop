@@ -1,48 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams } from 'react-router-dom';
+import { CartContext } from '../../context/CartContext';
 import { formatPrice } from '../../utils/formatPrice';
 
+/**
+ * Компонент Product - отображает детальную информацию о конкретном товаре
+ * 
+ * Функциональность:
+ * - Получает данные о товаре по ID из URL
+ * - Отображает детальную информацию о товаре
+ * - Позволяет добавить товар в корзину
+ * - Обрабатывает состояния загрузки и ошибок
+ */
 const Product = () => {
+  // Получение ID товара из URL
   const { id } = useParams();
-  const { addToCart } = useCart();
+  
+  // Получение функции добавления в корзину из контекста
+  const { addToCart } = useContext(CartContext);
+  
+  // Состояния компонента
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Загрузка данных о товаре при монтировании компонента
   useEffect(() => {
-    fetch(`https://fakestoreapi.com/products/${id}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        setProduct(data);
-        setLoading(false);
-      })
-      .catch(error => {
-        setError(error.message);
-        setLoading(false);
-      });
+    fetchProduct();
   }, [id]);
 
-  if (loading) {
-    return <div className="product__loading">Loading...</div>;
-  }
+  /**
+   * Получает данные о товаре с API
+   * Обновляет состояния product, loading и error
+   */
+  const fetchProduct = async () => {
+    try {
+      const response = await fetch(`https://fakestoreapi.com/products/${id}`);
+      if (!response.ok) {
+        throw new Error('Product not found');
+      }
+      const data = await response.json();
+      setProduct(data);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
 
-  if (error) {
-    return <div className="product__error">Error: {error}</div>;
-  }
-
-  if (!product) {
-    return <div className="product__error">Product not found</div>;
-  }
-
-  const handleAddToCart = () => {
+  /**
+   * Обработчик добавления товара в корзину
+   * @param {Object} product - товар для добавления в корзину
+   */
+  const handleAddToCart = (product) => {
     addToCart(product);
   };
+
+  // Отображение состояния загрузки
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  // Отображение ошибки, если она есть
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  // Отображение информации о товаре
+  if (!product) {
+    return <div>Product not found</div>;
+  }
 
   return (
     <div className="product">
@@ -56,7 +83,7 @@ const Product = () => {
           <p className="product__price">${formatPrice(product.price)}</p>
           <p className="product__description">{product.description}</p>
           <p className="product__category">Category: {product.category}</p>
-          <button onClick={handleAddToCart} className="product__add-to-cart">
+          <button onClick={() => handleAddToCart(product)} className="product__add-to-cart">
             Add to Cart
           </button>
         </div>

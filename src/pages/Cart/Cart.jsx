@@ -1,11 +1,47 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
+import React, { useContext } from 'react';
+import { CartContext } from '../../context/CartContext';
 import { formatPrice } from '../../utils/formatPrice';
 
+/**
+ * Компонент Cart - отображает корзину покупок
+ * 
+ * Функциональность:
+ * - Отображает список товаров в корзине
+ * - Позволяет изменять количество товаров
+ * - Позволяет удалять товары из корзины
+ * - Показывает общую стоимость заказа
+ */
 const Cart = () => {
-  const { cartItems, removeFromCart, updateQuantity, getCartTotal } = useCart();
+  // Получение функций и данных из контекста корзины
+  const { 
+    cartItems, 
+    removeFromCart, 
+    updateQuantity,
+    clearCart 
+  } = useContext(CartContext);
 
+  /**
+   * Вычисляет общую стоимость товаров в корзине
+   * @returns {number} Общая стоимость
+   */
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => {
+      return total + (item.price * item.quantity);
+    }, 0);
+  };
+
+  /**
+   * Обработчик изменения количества товара
+   * @param {Object} item - товар
+   * @param {number} newQuantity - новое количество
+   */
+  const handleQuantityChange = (item, newQuantity) => {
+    if (newQuantity >= 1) {
+      updateQuantity(item.id, newQuantity);
+    }
+  };
+
+  // Если корзина пуста, показываем соответствующее сообщение
   if (cartItems.length === 0) {
     return (
       <div className="cart cart--empty">
@@ -27,14 +63,14 @@ const Cart = () => {
             </div>
             <div className="cart__item-actions">
               <button
-                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                onClick={() => handleQuantityChange(item, item.quantity - 1)}
                 className="cart__item-button"
               >
                 -
               </button>
               <span className="cart__item-quantity">{item.quantity}</span>
               <button
-                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                onClick={() => handleQuantityChange(item, item.quantity + 1)}
                 className="cart__item-button"
               >
                 +
@@ -50,7 +86,7 @@ const Cart = () => {
         ))}
       </div>
       <div className="cart__total">
-        <h2>Total: ${formatPrice(getCartTotal())}</h2>
+        <h2>Total: ${formatPrice(calculateTotal())}</h2>
         <button className="cart__checkout">Proceed to Checkout</button>
       </div>
     </div>
