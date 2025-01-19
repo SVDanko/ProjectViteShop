@@ -1,42 +1,47 @@
 import React from "react";
-import { Route, Routes, NavLink } from "react-router-dom";
+import { Router, Route, Link } from "react-router";
+import { createBrowserHistory } from "history";
 import Home from "./pages/Home/Home";
 import Product from "./pages/Product/Product";
 import Products from "./pages/Products/Products";
 import Cart from "./pages/Cart/Cart";
 import { CartProvider } from "./context/CartContext";
 
+const history = createBrowserHistory();
+
 const App = () => {
-  const setActiveLink = ({ isActive }) => (isActive ? "navbar__item navbar__item-active" : "navbar__item");
+  const setActiveLink = (path) => {
+    return window.location.pathname === path ? "navbar__item navbar__item-active" : "navbar__item";
+  };
 
   return (
     <CartProvider>
-      <header>
-        <nav>
-          <ul className="navbar">
-            <div className="navbar__left">
-              <li>
-                <NavLink to="/" className={setActiveLink}>Home</NavLink>
-              </li>
-              <li>
-                <NavLink to="/products" className={setActiveLink}>Products</NavLink>
-              </li>
-            </div>
-            <div className="navbar__right">
-              <li>
-                <NavLink to="/cart" className={setActiveLink}>Cart</NavLink>
-              </li>
-            </div>
-          </ul>
-        </nav>
-      </header>
-      
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/products/:id" element={<Product />} />
-        <Route path="/cart" element={<Cart />} />
-      </Routes>
+      <Router history={history}>
+        <header>
+          <nav>
+            <ul className="navbar">
+              <div className="navbar__left">
+                <li>
+                  <Link to="/" className={setActiveLink("/")}>Home</Link>
+                </li>
+                <li>
+                  <Link to="/products" className={setActiveLink("/products")}>Products</Link>
+                </li>
+              </div>
+              <div className="navbar__right">
+                <li>
+                  <Link to="/cart" className={setActiveLink("/cart")}>Cart</Link>
+                </li>
+              </div>
+            </ul>
+          </nav>
+        </header>
+        
+        <Route exact path="/" component={Home} />
+        <Route exact path="/products" component={Products} />
+        <Route path="/products/:id" component={Product} />
+        <Route exact path="/cart" component={Cart} />
+      </Router>
     </CartProvider>
   );
 };
