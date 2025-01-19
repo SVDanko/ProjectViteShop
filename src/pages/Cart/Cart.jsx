@@ -1,9 +1,14 @@
-import React, { useContext } from 'react';
-import { CartContext } from '../../context/CartContext';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { formatPrice } from '../../utils/formatPrice';
 
 /**
  * Компонент Cart - отображает корзину покупок
+ * 
+ * @param {Object} props - пропсы компонента
+ * @param {Array} props.cartItems - массив товаров в корзине
+ * @param {Function} props.removeFromCart - функция для удаления товара из корзины
+ * @param {Function} props.updateQuantity - функция для обновления количества товара
  * 
  * Функциональность:
  * - Отображает список товаров в корзине
@@ -11,15 +16,7 @@ import { formatPrice } from '../../utils/formatPrice';
  * - Позволяет удалять товары из корзины
  * - Показывает общую стоимость заказа
  */
-const Cart = () => {
-  // Получение функций и данных из контекста корзины
-  const { 
-    cartItems, 
-    removeFromCart, 
-    updateQuantity,
-    clearCart 
-  } = useContext(CartContext);
-
+const Cart = ({ cartItems, removeFromCart, updateQuantity }) => {
   /**
    * Вычисляет общую стоимость товаров в корзине
    * @returns {number} Общая стоимость
